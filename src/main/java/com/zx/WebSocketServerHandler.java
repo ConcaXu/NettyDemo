@@ -11,6 +11,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) {
+        System.err.println("ctx:: " + ctx);
+        System.err.println("msg:: " + msg);
         // 处理接收到的客户端消息
         String clientMessage = msg.text();
         System.out.println("Received message from client: " + clientMessage);
@@ -30,4 +32,29 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
         cause.printStackTrace();
         ctx.close();
     }
+
+//    @Override
+//    public void channelActive(ChannelHandlerContext ctx) {
+//        ctx.channel().writeAndFlush(new TextWebSocketFrame("欢迎进入直播间!"));
+//        System.err.println("channelActive::" + "已连接");
+//    }
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        // 使用TextWebSocketFrame发送消息
+        ctx.channel().writeAndFlush(new TextWebSocketFrame("欢迎进入直播间!"));
+        System.err.println("channelActive::" + "已连接");
+    }
+
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        ctx.channel().writeAndFlush("欢迎下次再来");
+        System.err.println("用户已离开");
+    }
+
+//    @Override
+//    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+//        System.err.println("channelRead msg::" + msg);
+//        super.channelRead(ctx, msg);
+//    }
 }
