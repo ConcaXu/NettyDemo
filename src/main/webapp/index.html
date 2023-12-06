@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Chat</title>
+</head>
+<body>
+<ul id="messageList"></ul>
+<input type="text" id="usernameInput" placeholder="Enter your username">
+<input type="text" id="targetUserInput" placeholder="Enter target username">
+<input type="text" id="messageInput">
+<button onclick="connect()">Connect</button>
+<button onclick="sendMessage()">Send</button>
+
+<script>
+  var socket;
+  var username;
+
+  function connect() {
+    username = document.getElementById("usernameInput").value;
+
+    // 检查用户名是否为空
+    if (!username) {
+      alert("Please enter your username.");
+      return;
+    }
+
+    // 创建WebSocket连接
+    socket = new WebSocket("ws://localhost:8080/chat");
+
+    // 在连接建立时发送用户名信息
+    socket.onopen = function(event) {
+      socket.send("Username:" + username);
+    };
+
+    // 处理接收到的消息
+    socket.onmessage = function(event) {
+      var messageList = document.getElementById("messageList");
+      var listItem = document.createElement("li");
+      listItem.textContent = event.data;
+      messageList.appendChild(listItem);
+    };
+
+    // 处理连接关闭事件
+    socket.onclose = function(event) {
+      alert("Connection closed.");
+    };
+  }
+
+  function sendMessage() {
+    var targetUserInput = document.getElementById("targetUserInput");
+    var messageInput = document.getElementById("messageInput");
+    var targetUsername = targetUserInput.value;
+    var message = messageInput.value;
+
+    // 检查目标用户名和消息是否为空
+    if (!targetUsername) {
+      alert("Please enter target username.");
+      return;
+    }
+
+    if (!message) {
+      alert("Please enter a message.");
+      return;
+    }
+
+    // 发送消息
+    socket.send("To:" + targetUsername + ":" + message);
+
+    // 清空输入框
+    targetUserInput.value = "";
+    messageInput.value = "";
+  }
+</script>
+</body>
+</html>
